@@ -3,7 +3,9 @@ package me.friwi.tello4j.wifi.impl.binary;
 import org.codehaus.preon.annotation.BoundNumber;
 import org.codehaus.preon.annotation.BoundObject;
 import org.codehaus.preon.annotation.Choices;
+import org.codehaus.preon.el.ImportStatic;
 
+@ImportStatic(TelloMessageID.class)
 public class TelloSubPacket {
 
     //From header to Packet Size
@@ -22,8 +24,8 @@ public class TelloSubPacket {
 
     @BoundObject(selectFrom = @Choices(
             alternatives = {
-                    @Choices.Choice(condition = "messageID.value == 0x56", type = FlightData.class)
-//                    @Choices.Choice(condition = "messageID == TelloMessageId.LogHeader", type = LogHeader.class),
+                    @Choices.Choice(condition = "messageID == TelloMessageID.FlightStatus", type = FlightData.class),
+//                    @Choices.Choice(condition = "messageID == TelloMessageID.WifiStrength", type = WifiStrength.class),
 //                    @Choices.Choice(condition = "messageID == TelloMessageId.LogData", type = LogData.class)
             }
     ))

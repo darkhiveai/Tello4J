@@ -108,8 +108,6 @@ public class TelloPacket {
 
     @BoundObject
     public TelloSubPacket body;
-    @BoundNumber(size="13")
-    public int overflow;
 
     @BoundNumber(size="16")
     public int crc16;
