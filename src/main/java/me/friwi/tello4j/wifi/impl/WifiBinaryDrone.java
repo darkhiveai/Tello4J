@@ -21,24 +21,32 @@ import me.friwi.tello4j.api.exception.*;
 import me.friwi.tello4j.api.world.FlipDirection;
 import me.friwi.tello4j.api.world.MovementDirection;
 import me.friwi.tello4j.api.world.TurnDirection;
+import me.friwi.tello4j.wifi.impl.binary.ConnectRequest;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryCommand;
 import me.friwi.tello4j.wifi.impl.command.control.*;
 import me.friwi.tello4j.wifi.impl.command.read.*;
 import me.friwi.tello4j.wifi.impl.command.set.RemoteControlCommand;
 import me.friwi.tello4j.wifi.impl.command.set.SetSpeedCommand;
 import me.friwi.tello4j.wifi.impl.command.set.SetWifiPasswordAndSSIDCommand;
-import me.friwi.tello4j.wifi.impl.network.TelloCommandConnection;
+import me.friwi.tello4j.wifi.impl.network.TelloBinaryCommandConnection;
+import me.friwi.tello4j.wifi.impl.network.TelloTextCommandConnection;
 import me.friwi.tello4j.wifi.impl.response.TelloReadCommandResponse;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
 import me.friwi.tello4j.wifi.model.command.ReadCommand;
 import me.friwi.tello4j.wifi.model.response.TelloResponse;
+import org.codehaus.preon.Codec;
+import org.codehaus.preon.Codecs;
 
-public class WifiDrone extends TelloDrone {
-    private TelloCommandConnection commandConnection;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+public class WifiBinaryDrone extends TelloDrone {
+    private TelloTextCommandConnection commandConnection;
 
     private boolean streaming = false;
 
-    public WifiDrone() {
-        this.commandConnection = new TelloCommandConnection(this);
+    public WifiBinaryDrone() {
+        this.commandConnection = new TelloBinaryCommandConnection(this);
     }
 
     @Override

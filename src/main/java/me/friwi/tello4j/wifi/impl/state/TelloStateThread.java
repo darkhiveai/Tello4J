@@ -20,7 +20,7 @@ import me.friwi.tello4j.api.exception.TelloException;
 import me.friwi.tello4j.api.exception.TelloNetworkException;
 import me.friwi.tello4j.api.state.StateListener;
 import me.friwi.tello4j.api.state.TelloDroneState;
-import me.friwi.tello4j.wifi.impl.network.TelloCommandConnection;
+import me.friwi.tello4j.wifi.impl.network.TelloTextCommandConnection;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
 
 import java.io.UnsupportedEncodingException;
@@ -31,10 +31,10 @@ import java.util.Arrays;
 
 public class TelloStateThread extends Thread {
     private boolean running = true;
-    private TelloCommandConnection connection;
+    private TelloTextCommandConnection connection;
     private DatagramSocket ds;
 
-    public TelloStateThread(TelloCommandConnection connection) {
+    public TelloStateThread(TelloTextCommandConnection connection) {
         this.connection = connection;
     }
 

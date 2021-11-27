@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package me.friwi.tello4j.wifi.impl.response;
+package me.friwi.tello4j.wifi.impl.binary.response;
 
+import me.friwi.tello4j.wifi.impl.response.CommandResultType;
 import me.friwi.tello4j.wifi.model.command.TelloCommand;
 import me.friwi.tello4j.wifi.model.response.TelloResponse;
 

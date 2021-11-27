@@ -23,6 +23,8 @@ import me.friwi.tello4j.wifi.impl.response.CommandResultType;
 import me.friwi.tello4j.wifi.impl.response.TelloCommandResultResponse;
 import me.friwi.tello4j.wifi.model.response.TelloResponse;
 
+import java.io.UnsupportedEncodingException;
+
 public abstract class TelloResultCommand extends TelloCommand {
     private String cmd;
 
@@ -30,8 +32,8 @@ public abstract class TelloResultCommand extends TelloCommand {
         this.cmd = cmd;
     }
 
-    public String serializeCommand() {
-        return this.cmd;
+    public byte[] serializeCommand() throws UnsupportedEncodingException {
+        return this.cmd.getBytes("UTF-8");
     }
 
     public TelloResponse buildResponse(String data) throws TelloGeneralCommandException, TelloNoValidIMUException, TelloCustomCommandException {
@@ -39,7 +41,12 @@ public abstract class TelloResultCommand extends TelloCommand {
         if (response.getCommandResultType() == CommandResultType.ERROR) {
             if (response.getMessage().equalsIgnoreCase("error")) throw new TelloGeneralCommandException();
             if (response.getMessage().equalsIgnoreCase("error No valid imu")) throw new TelloNoValidIMUException();
-            throw new TelloCustomCommandException("Error while executing command \"" + serializeCommand() + "\": " + response.getMessage(), response.getMessage());
+            try {
+                throw new TelloCustomCommandException("Error while executing command \"" + serializeCommand() + "\": " + response.getMessage(), response.getMessage());
+            } catch (UnsupportedEncodingException e) {
+                //TODO
+                e.printStackTrace();
+            }
         }
         return response;
     }

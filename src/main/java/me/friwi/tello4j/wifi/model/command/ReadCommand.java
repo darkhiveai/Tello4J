@@ -24,6 +24,8 @@ import me.friwi.tello4j.wifi.impl.response.CommandResultType;
 import me.friwi.tello4j.wifi.impl.response.TelloReadCommandResponse;
 import me.friwi.tello4j.wifi.model.response.TelloResponse;
 
+import java.io.UnsupportedEncodingException;
+
 public abstract class ReadCommand extends TelloCommand {
     private String command;
 
@@ -32,12 +34,12 @@ public abstract class ReadCommand extends TelloCommand {
     }
 
     @Override
-    public String serializeCommand() {
-        return this.command;
+    public byte[] serializeCommand() throws UnsupportedEncodingException {
+            return this.command.getBytes("UTF-8");
     }
 
     @Override
-    public TelloResponse buildResponse(String data) throws TelloNetworkException, TelloGeneralCommandException, TelloNoValidIMUException, TelloCustomCommandException {
+    public TelloResponse buildResponse(String data) throws TelloNetworkException, TelloGeneralCommandException, TelloNoValidIMUException, TelloCustomCommandException, UnsupportedEncodingException {
         TelloReadCommandResponse response = new TelloReadCommandResponse(this, data);
         if (response.getCommandResultType() == CommandResultType.ERROR) {
             if (response.getMessage().equalsIgnoreCase("error")) throw new TelloGeneralCommandException();

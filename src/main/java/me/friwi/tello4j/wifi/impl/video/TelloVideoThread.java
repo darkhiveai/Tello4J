@@ -18,7 +18,7 @@ package me.friwi.tello4j.wifi.impl.video;
 
 import me.friwi.tello4j.api.exception.TelloException;
 import me.friwi.tello4j.api.exception.TelloNetworkException;
-import me.friwi.tello4j.wifi.impl.network.TelloCommandConnection;
+import me.friwi.tello4j.wifi.impl.network.TelloTextCommandConnection;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
 
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class TelloVideoThread extends Thread {
     boolean running = true;
     TelloVideoQueue queue;
     PipedInputStream pis = new PipedInputStream();
-    private TelloCommandConnection connection;
+    private TelloTextCommandConnection connection;
     private DatagramSocket ds;
     private List<byte[]> currentFrame = new LinkedList<>();
     private PipedOutputStream pos;
@@ -45,7 +45,7 @@ public class TelloVideoThread extends Thread {
     private byte[] buf = new byte[2048];
     private TelloFrameGrabberThread frameGrabberThread;
 
-    public TelloVideoThread(TelloCommandConnection connection) throws TelloNetworkException {
+    public TelloVideoThread(TelloTextCommandConnection connection) throws TelloNetworkException {
         this.connection = connection;
         this.queue = new TelloVideoQueue(this);
         try {
@@ -105,7 +105,7 @@ public class TelloVideoThread extends Thread {
         ds.close();
     }
 
-    TelloCommandConnection getConnection() {
+    TelloTextCommandConnection getConnection() {
         return connection;
     }
 }

@@ -16,8 +16,10 @@
 
 package me.friwi.tello4j.wifi.impl.network;
 
+import me.friwi.tello4j.api.drone.TelloDrone;
 import me.friwi.tello4j.api.exception.*;
-import me.friwi.tello4j.wifi.impl.WifiDrone;
+import me.friwi.tello4j.wifi.impl.WifiBinaryDrone;
+import me.friwi.tello4j.wifi.impl.WifiTextDrone;
 import me.friwi.tello4j.wifi.impl.state.TelloStateThread;
 import me.friwi.tello4j.wifi.impl.video.TelloVideoThread;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
@@ -32,7 +34,7 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
-public class TelloCommandConnection {
+public class TelloBinaryCommandConnection extends TelloTextCommandConnection {
     DatagramSocket ds;
     InetAddress remoteAddress;
     boolean connectionState = false;
@@ -40,12 +42,13 @@ public class TelloCommandConnection {
     TelloStateThread stateThread;
     TelloVideoThread videoThread;
 
-    WifiDrone drone;
+    TelloDrone drone;
 
     private long lastCommand = -1;
     private boolean onceConnected = false;
 
-    public TelloCommandConnection(WifiDrone drone) {
+    public TelloBinaryCommandConnection(WifiBinaryDrone drone) {
+        super(drone);
         this.drone = drone;
     }
 
@@ -91,7 +94,13 @@ public class TelloCommandConnection {
             try {
                 cmd.wait(); //Wait for finish in command queue
             } catch (InterruptedException e) {
-                throw new TelloNetworkException("\"" + cmd.serializeCommand() + "\" command was interrupted while executing it!");
+                try {
+                    throw new TelloNetworkException("\"" + cmd.serializeCommand() + "\" command was interrupted while executing it!");
+                } catch (UnsupportedEncodingException ex) {
+
+                    //TODO
+                    ex.printStackTrace();
+                }
             }
         }
         if (cmd.getException() != null) {
@@ -108,7 +117,12 @@ public class TelloCommandConnection {
             }
         }
         if (cmd.getResponse() == null) {
-            throw new TelloNetworkException("\"" + cmd.serializeCommand() + "\" command was not answered!");
+            try {
+                throw new TelloNetworkException("\"" + cmd.serializeCommand() + "\" command was not answered!");
+            } catch (UnsupportedEncodingException e) {
+                //TODO
+                e.printStackTrace();
+            }
         }
         return cmd.getResponse();
     }
@@ -125,7 +139,7 @@ public class TelloCommandConnection {
         }
     }
 
-    private void send(byte[] bytes) throws TelloNetworkException {
+    void send(byte[] bytes) throws TelloNetworkException {
         if (!connectionState)
             throw new TelloNetworkException("Can not send/receive data when the connection is closed!");
         DatagramPacket packet = new DatagramPacket(bytes, bytes.length, remoteAddress, TelloSDKValues.COMMAND_PORT);
@@ -139,7 +153,8 @@ public class TelloCommandConnection {
     private byte[] readBytes() throws TelloNetworkException, TelloCommandTimedOutException {
         if (!connectionState)
             throw new TelloNetworkException("Can not send/receive data when the connection is closed!");
-        byte[] data = new byte[256];
+        //Read larger packets -- to drain buffer. Max packet should be
+        byte[] data = new byte[384];
         DatagramPacket packet = new DatagramPacket(data, data.length);
         try {
             ds.receive(packet);
@@ -168,7 +183,7 @@ public class TelloCommandConnection {
         return connectionState && (lastCommand+TelloSDKValues.COMMAND_TIMEOUT) > System.currentTimeMillis();
     }
 
-    public WifiDrone getDrone() {
+    public TelloDrone getDrone() {
         return drone;
     }
 }

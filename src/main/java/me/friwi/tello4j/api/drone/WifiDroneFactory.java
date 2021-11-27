@@ -16,7 +16,12 @@
 
 package me.friwi.tello4j.api.drone;
 
-import me.friwi.tello4j.wifi.impl.WifiDrone;
+import me.friwi.tello4j.wifi.impl.WifiBinaryDrone;
+import me.friwi.tello4j.wifi.impl.WifiTextDrone;
+import me.friwi.tello4j.wifi.model.PacketMode;
+
+import static me.friwi.tello4j.wifi.model.PacketMode.*;
+import static me.friwi.tello4j.wifi.model.PacketMode.BINARY;
 
 /**
  * A factory to create a new {@link TelloDrone}, which is connected by wifi
@@ -29,7 +34,14 @@ public class WifiDroneFactory {
      *
      * @return new {@link TelloDrone}
      */
-    public TelloDrone build() {
-        return new WifiDrone();
+    public TelloDrone build(PacketMode packetMode) {
+        switch (packetMode) {
+           case BINARY:
+               return new WifiBinaryDrone();
+           case TEXT:
+            default:
+                return new WifiTextDrone();
+        }
+
     }
 }
