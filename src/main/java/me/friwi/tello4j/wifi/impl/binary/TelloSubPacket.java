@@ -3,17 +3,19 @@ package me.friwi.tello4j.wifi.impl.binary;
 import org.codehaus.preon.annotation.BoundNumber;
 import org.codehaus.preon.annotation.BoundObject;
 import org.codehaus.preon.annotation.Choices;
+import org.codehaus.preon.buffer.ByteOrder;
 import org.codehaus.preon.el.ImportStatic;
 
 @ImportStatic(TelloMessageID.class)
 public class TelloSubPacket {
 
-    //From header to Packet Size
-    @BoundNumber(size="8")
-    public short crc8;
 
-    @BoundObject
-    public PacketType packetType;
+
+    //    @BoundObject
+    //    public PacketType packetType;
+    //Workaround as Preon encoding/decoding failing on this due to LE/BE.
+    @BoundNumber(size="8", byteOrder = ByteOrder.LittleEndian)
+    public PacketTypeValues packetType;
 
     @BoundNumber(size="16")
     public TelloMessageID messageID;

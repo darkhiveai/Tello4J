@@ -107,6 +107,18 @@ public abstract class TelloDrone implements AutoCloseable {
     public abstract void takeoff() throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException;
 
     /**
+     * Instructs this drone to take off from a started position.
+     *
+     * @throws TelloNetworkException         If there was an error sending the command or receiving the result.
+     * @throws TelloCommandTimedOutException If the drone does not answer.
+     * @throws TelloCustomCommandException   If the drone responds with a custom error message.
+     *                                       Use {@link TelloCustomCommandException#getReason()} to fetch the custom error message.
+     * @throws TelloGeneralCommandException  If the drone responds with an unspecified error (possibly battery too low).
+     */
+    public abstract void throwAndGo() throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException;
+
+
+    /**
      * Instructs this drone to land.
      *
      * @throws TelloNetworkException         If there was an error sending the command or receiving the result.

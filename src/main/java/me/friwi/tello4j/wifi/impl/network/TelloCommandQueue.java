@@ -43,10 +43,10 @@ public class TelloCommandQueue extends Thread {
                     this.connection.send(cmd.serializeCommand());
 
 
-                    if (connection instanceof TelloTextCommandConnection)
-                        processTextMessages(cmd);
-                    else
+                    if (connection instanceof TelloBinaryCommandConnection)
                         processBinaryMessages(cmd);
+                    else
+                        processTextMessages(cmd);
 
                     synchronized (cmd) {
                         cmd.notifyAll();
@@ -75,8 +75,8 @@ public class TelloCommandQueue extends Thread {
 
 
     private void processBinaryMessages(TelloCommand cmd) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, UnsupportedEncodingException, TelloGeneralCommandException, TelloNoValidIMUException {
-        //Read response, or assume ok with the remote control command
-        String data = cmd instanceof RemoteControlCommand ? "ok" : this.connection.readString().trim();
+        /*//Read response, or assume ok with the remote control command
+        String data = this.connection.readString().trim();
         int attempt = 0;
         boolean invalid;
         do {
@@ -89,20 +89,20 @@ public class TelloCommandQueue extends Thread {
 
 
             invalid = !data.startsWith("conn_ack");
-            if (!TelloSDKValues.COMMAND_REPLY_PATTERN.matcher(data).matches()) invalid = true;
+//            if (!TelloSDKValues.COMMAND_REPLY_PATTERN.matcher(data).matches()) invalid = true;
             if (invalid && TelloSDKValues.DEBUG) {
                 System.err.println("Dropping reply \"" + data + "\" as it might be binary");
             }
             attempt++;
             if (invalid && attempt >= TelloSDKValues.COMMAND_SOCKET_BINARY_ATTEMPTS) {
-                throw new TelloNetworkException("Too many binary messages received after sending command. Broken connection?");
+                throw new TelloNetworkException("Too many binary messages received after sending command that could not be read. Broken connection?");
             }
             if (invalid) {
                 data = this.connection.readString().trim();
             }
         } while (invalid);
         TelloResponse response = cmd.buildResponse(data);
-        cmd.setResponse(response);
+        cmd.setResponse(response);*/
 
     }
 

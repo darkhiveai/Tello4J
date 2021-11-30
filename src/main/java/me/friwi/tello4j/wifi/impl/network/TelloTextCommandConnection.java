@@ -34,17 +34,17 @@ import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
 public class TelloTextCommandConnection {
-    DatagramSocket ds;
-    InetAddress remoteAddress;
+    protected DatagramSocket ds;
+    protected InetAddress remoteAddress;
     boolean connectionState = false;
-    TelloCommandQueue queue;
-    TelloStateThread stateThread;
-    TelloVideoThread videoThread;
+    protected TelloCommandQueue queue;
+    protected TelloStateThread stateThread;
+    protected TelloVideoThread videoThread;
 
-    TelloDrone drone;
+    protected TelloDrone drone;
 
-    private long lastCommand = -1;
-    private boolean onceConnected = false;
+    protected long lastCommand = -1;
+    protected boolean onceConnected = false;
 
     public TelloTextCommandConnection(TelloDrone drone) {
         this.drone = drone;

@@ -1,6 +1,7 @@
 package me.friwi.tello4j.wifi.impl.binary;
 
 
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryConnectRequest;
 import org.codehaus.preon.Codec;
 import org.codehaus.preon.Codecs;
 import org.codehaus.preon.DecodingException;
@@ -54,6 +55,26 @@ public class PacketTest {
         byte[] data = hexStringToByteArray(PACKET1);
         int crc16 = TelloPacket.crc16(Arrays.copyOf(data, data.length-2));
         TelloPacket packet = Codecs.decode(codec, data);
+        //test roundtrip
+        byte[] codecSerialized = Codecs.encode(packet, codec);
+        TelloPacket packet2 = Codecs.decode(codec, codecSerialized);
+        boolean equal = Arrays.equals(data, codecSerialized);
+        Codec<PacketType> packetTypeCodec = Codecs.create(PacketType.class);
+        PacketType packetType =  Codecs.decode(packetTypeCodec, new byte[]{(byte) 0x88});
+        byte[] packetTypeBytes = Codecs.encode(packetType, packetTypeCodec);
+        PacketType packetType2 =  Codecs.decode(packetTypeCodec, packetTypeBytes)   ;
+//        packetType.fromDrone = 1;
+//        packetType.packetSubType = 6;
+//        packetType.packetType = PacketTypeValues.DATA1;
+
+
+
+        byte[] serialized = packet.serializeCommand();
+        packet.serializeCommand();
+        packet.serializeCommand();
+
+        boolean equal2 = Arrays.equals(data, serialized);
+
         packet = Codecs.decode(codec, hexStringToByteArray(PACKET2));
         packet = Codecs.decode(codec, hexStringToByteArray(PACKET4));
         System.out.println(packet);
@@ -66,20 +87,10 @@ public class PacketTest {
 
         Codec<TelloPacket> codec = Codecs.create(TelloPacket.class);
 
-        TelloPacket packet = new TelloPacket();
-
-        packet.body.packetType = new PacketType();
-        packet.body.packetType.packetType = PacketTypeValues.DATA1;
-        packet.body.messageID = TelloMessageID.Connect;
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Codecs.encode(packet, codec, out);
-
-        System.out.println(out);
 
 
-        Codec<ConnectRequest> codec2 = Codecs.create(ConnectRequest.class);
-        ConnectRequest request = new ConnectRequest();
+        Codec<TelloBinaryConnectRequest> codec2 = Codecs.create(TelloBinaryConnectRequest.class);
+        TelloBinaryConnectRequest request = new TelloBinaryConnectRequest();
         ByteArrayOutputStream out2 = new ByteArrayOutputStream();
         Codecs.encode(request, codec2, out2);
 

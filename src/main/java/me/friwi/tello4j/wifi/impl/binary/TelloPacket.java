@@ -1,18 +1,29 @@
 package me.friwi.tello4j.wifi.impl.binary;
 
+import me.friwi.tello4j.api.exception.TelloCustomCommandException;
+import me.friwi.tello4j.api.exception.TelloGeneralCommandException;
+import me.friwi.tello4j.api.exception.TelloNetworkException;
+import me.friwi.tello4j.api.exception.TelloNoValidIMUException;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryCommand;
+import me.friwi.tello4j.wifi.model.response.TelloResponse;
+import org.codehaus.preon.Codec;
+import org.codehaus.preon.Codecs;
 import org.codehaus.preon.annotation.BoundNumber;
 import org.codehaus.preon.annotation.BoundObject;
-import org.codehaus.preon.annotation.Choices;
-import org.codehaus.preon.annotation.Slice;
-import org.codehaus.preon.buffer.ByteOrder;
 import org.codehaus.preon.el.ImportStatic;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 @ImportStatic(TelloMessageID.class)
-public class TelloPacket {
+public class TelloPacket extends TelloBinaryCommand {
 
-    private static short[] crc8table = {
+    private static final short[] crc8table = {
             0x00, 0x5e, 0xbc, 0xe2, 0x61, 0x3f, 0xdd, 0x83,
             0xc2, 0x9c, 0x7e, 0x20, 0xa3, 0xfd, 0x1f, 0x41,
             0x9d, 0xc3, 0x21, 0x7f, 0xfc, 0xa2, 0x40, 0x1e,
@@ -47,7 +58,7 @@ public class TelloPacket {
             0xb6, 0xe8, 0x0a, 0x54, 0xd7, 0x89, 0x6b, 0x35
     };
 
-    private static int[] crc16table = {
+    private static final int[] crc16table = {
             0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
             0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
             0x1081, 0x0108, 0x3393, 0x221a, 0x56a5, 0x472c, 0x75b7, 0x643e,
@@ -82,6 +93,65 @@ public class TelloPacket {
             0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78
     };
 
+
+
+    private static final Codec<TelloPacket> TELLO_PACKET_CODEC = Codecs.create(TelloPacket.class);
+
+    private static final Codec<TelloHeader> TELLO_HEADER_CODEC = Codecs.create(TelloHeader.class);
+
+    private static final Codec<TelloSubPacket> TELLO_SUB_PACKET_CODEC = Codecs.create(TelloSubPacket.class);
+
+
+
+    @BoundObject
+    public TelloHeader header;
+
+    //From header to Packet Size
+    @BoundNumber(size="8")
+    public short crc8;
+
+    @BoundObject
+    public TelloSubPacket body;
+
+    @BoundNumber(size="16")
+    public int crc16;
+
+
+    private final ByteArrayOutputStream baOut = new ByteArrayOutputStream();
+    private final DataOutputStream out = new DataOutputStream(baOut);
+    private final ByteBuffer buf = ByteBuffer.allocateDirect(2);
+    @Override
+    public byte[] serializeCommand() {
+
+
+        try {
+
+            baOut.reset();
+            Codecs.encode(header, TELLO_HEADER_CODEC, out);
+            this.crc8 = crc8(baOut.toByteArray());
+            out.writeByte(this.crc8);
+
+            Codecs.encode(body, TELLO_SUB_PACKET_CODEC, out);
+            this.crc16 = crc16(baOut.toByteArray());
+            //Hack to write LE CRC16 for Tello.
+            buf.position(0);
+            buf.putShort((short) this.crc16);
+            buf.order(ByteOrder.LITTLE_ENDIAN);
+            buf.rewind();
+            out.writeShort(buf.getShort());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return baOut.toByteArray();
+    }
+
+    @Override
+    public TelloResponse buildResponse(String data) throws TelloGeneralCommandException, TelloNoValidIMUException, TelloCustomCommandException, TelloNetworkException, UnsupportedEncodingException {
+        return null;
+    }
+
+
     public static short crc8(byte[] buffer){
         short crc = 0x77;
         byte[] bytes = Arrays.copyOf(buffer,3);
@@ -99,19 +169,6 @@ public class TelloPacket {
         }
         return crc;
     }
-
-
-    @BoundObject
-    public TelloHeader header;
-
-
-
-    @BoundObject
-    public TelloSubPacket body;
-
-    @BoundNumber(size="16")
-    public int crc16;
-
 
 
 

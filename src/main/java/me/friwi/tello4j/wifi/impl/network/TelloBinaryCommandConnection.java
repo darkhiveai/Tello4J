@@ -35,17 +35,6 @@ import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
 public class TelloBinaryCommandConnection extends TelloTextCommandConnection {
-    DatagramSocket ds;
-    InetAddress remoteAddress;
-    boolean connectionState = false;
-    TelloCommandQueue queue;
-    TelloStateThread stateThread;
-    TelloVideoThread videoThread;
-
-    TelloDrone drone;
-
-    private long lastCommand = -1;
-    private boolean onceConnected = false;
 
     public TelloBinaryCommandConnection(WifiBinaryDrone drone) {
         super(drone);
@@ -64,7 +53,8 @@ public class TelloBinaryCommandConnection extends TelloTextCommandConnection {
             ds = new DatagramSocket(TelloSDKValues.COMMAND_PORT);
             ds.setSoTimeout(TelloSDKValues.COMMAND_SOCKET_TIMEOUT);
             ds.connect(remoteAddress, TelloSDKValues.COMMAND_PORT);
-            stateThread.connect();
+            //Unlike Text thread, share the socket.
+            stateThread.connect(ds);
             videoThread.connect();
             queue.start();
             stateThread.start();
@@ -116,14 +106,14 @@ public class TelloBinaryCommandConnection extends TelloTextCommandConnection {
                 throw (TelloCustomCommandException) cmd.getException();
             }
         }
-        if (cmd.getResponse() == null) {
-            try {
-                throw new TelloNetworkException("\"" + cmd.serializeCommand() + "\" command was not answered!");
-            } catch (UnsupportedEncodingException e) {
-                //TODO
-                e.printStackTrace();
-            }
-        }
+//        if (cmd.getResponse() == null) {
+//            try {
+//                throw new TelloNetworkException("\"" + cmd.serializeCommand() + "\" command was not answered!");
+//            } catch (UnsupportedEncodingException e) {
+//                //TODO
+//                e.printStackTrace();
+//            }
+//        }
         return cmd.getResponse();
     }
 

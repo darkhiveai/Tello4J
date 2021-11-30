@@ -22,8 +22,11 @@ public class TelloSDKValues {
     public static final String DRONE_IP_DST = "192.168.10.1";
     public static final String COMMANDER_IP_DST = "0.0.0.0";
 
+    //Only port used in binary mode for command and state.
     public static final int COMMAND_PORT = 8889;
+    //Only used in text/SDK mode.
     public static final int STATE_PORT = 8890;
+    //Default Video Port
     public static final int STREAM_PORT = 11111;
 
     public static final int COMMAND_SOCKET_TIMEOUT = 20000;

@@ -21,8 +21,6 @@ import me.friwi.tello4j.api.exception.*;
 import me.friwi.tello4j.api.world.FlipDirection;
 import me.friwi.tello4j.api.world.MovementDirection;
 import me.friwi.tello4j.api.world.TurnDirection;
-import me.friwi.tello4j.wifi.impl.binary.ConnectRequest;
-import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryCommand;
 import me.friwi.tello4j.wifi.impl.command.control.*;
 import me.friwi.tello4j.wifi.impl.command.read.*;
 import me.friwi.tello4j.wifi.impl.command.set.RemoteControlCommand;
@@ -33,11 +31,6 @@ import me.friwi.tello4j.wifi.impl.response.TelloReadCommandResponse;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
 import me.friwi.tello4j.wifi.model.command.ReadCommand;
 import me.friwi.tello4j.wifi.model.response.TelloResponse;
-import org.codehaus.preon.Codec;
-import org.codehaus.preon.Codecs;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 public class WifiTextDrone extends TelloDrone {
     private TelloTextCommandConnection commandConnection;
@@ -58,18 +51,7 @@ public class WifiTextDrone extends TelloDrone {
         this.commandConnection.connect(remoteAddr);
         //Enter SDK mode
         try {
-
-            ConnectRequest request = new ConnectRequest();
-            ByteArrayOutputStream out2 = new ByteArrayOutputStream();
-            Codec<ConnectRequest> codec2 = Codecs.create(ConnectRequest.class);
-            try {
-                Codecs.encode(request, codec2, out2);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            this.commandConnection.sendCommand(new TelloBinaryCommand(out2.toByteArray()));
-//            this.commandConnection.sendCommand(new EnterSDKModeCommand());
+            this.commandConnection.sendCommand(new EnterSDKModeCommand());
         } catch (TelloNoValidIMUException e) {
             //Will (hopefully) never happen
             e.printStackTrace();
@@ -93,6 +75,11 @@ public class WifiTextDrone extends TelloDrone {
             //Will (hopefully) never happen
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void throwAndGo() throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException {
+        throw new UnsupportedOperationException();
     }
 
     public void land() throws TelloCommandTimedOutException, TelloCustomCommandException, TelloNetworkException, TelloGeneralCommandException {

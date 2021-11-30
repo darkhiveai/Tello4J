@@ -9,22 +9,13 @@ import me.friwi.tello4j.wifi.model.response.TelloResponse;
 
 import java.io.UnsupportedEncodingException;
 
-public class TelloBinaryCommand extends TelloCommand {
+public abstract class TelloBinaryCommand extends TelloCommand {
 
-    private byte[] command;
-
-    public TelloBinaryCommand(byte[] command) {
-        this.command = command;
-    }
 
 
     @Override
-    public byte[] serializeCommand() {
-        return command;
-    }
+    public abstract byte[] serializeCommand();
 
     @Override
-    public TelloResponse buildResponse(String data) throws TelloGeneralCommandException, TelloNoValidIMUException, TelloCustomCommandException, TelloNetworkException, UnsupportedEncodingException {
-        return null;
-    }
+    public abstract TelloResponse buildResponse(String data) throws TelloGeneralCommandException, TelloNoValidIMUException, TelloCustomCommandException, TelloNetworkException, UnsupportedEncodingException;
 }

@@ -27,7 +27,7 @@ import me.friwi.tello4j.wifi.model.PacketMode;
 public class FlightPlanExample {
     public static void main(String args[]) {
         //Initialize a wifi drone
-        try (TelloDrone drone = new WifiDroneFactory().build(PacketMode.TEXT)) {
+        try (TelloDrone drone = new WifiDroneFactory().build(PacketMode.BINARY)) {
             drone.connect();
             //Subscribe to state updates of our drone (e.g. current speed, attitude)
             drone.addStateListener((o, n) -> {
@@ -47,7 +47,7 @@ public class FlightPlanExample {
             //...and tell the drone to turn on the stream
 //            drone.setStreaming(true);
             //Now perform a flight plan
-//            drone.takeoff();
+            drone.throwAndGo();
 //            drone.forward(30);
 //            drone.turnLeft(90);
 //            drone.forward(30);

@@ -19,6 +19,10 @@ package me.friwi.tello4j.wifi.impl.state;
 import me.friwi.tello4j.api.exception.TelloException;
 import me.friwi.tello4j.api.exception.TelloNetworkException;
 import me.friwi.tello4j.api.state.TelloDroneState;
+import me.friwi.tello4j.wifi.impl.binary.TelloPacket;
+import org.codehaus.preon.Codec;
+import org.codehaus.preon.Codecs;
+import org.codehaus.preon.DecodingException;
 
 public class TelloStateDeserializer {
     /**
@@ -28,6 +32,10 @@ public class TelloStateDeserializer {
      * @return a new TelloDroneState
      * @throws TelloException when the format is invalid
      */
+
+
+
+
     public static TelloDroneState deserialize(String state) throws TelloNetworkException {
         try {
             int pitch = 0, roll = 0, yaw = 0, speedX = 0, speedY = 0, speedZ = 0, tempLow = 0, tempHigh = 0, tofDistance = 0, height = 0, battery = 0, motorTime = 0;
@@ -101,5 +109,21 @@ public class TelloStateDeserializer {
         } catch (Exception e) {
             throw new TelloNetworkException("Error while parsing state input \"" + state + "\"");
         }
+    }
+
+
+    public static TelloDroneState deserialize(byte[] state) throws TelloNetworkException {
+        int pitch = 0, roll = 0, yaw = 0, speedX = 0, speedY = 0, speedZ = 0, tempLow = 0, tempHigh = 0, tofDistance = 0, height = 0, battery = 0, motorTime = 0;
+        double barometer = 0, accelerationX = 0, accelerationY = 0, accelerationZ = 0;
+//        try {
+//
+//          TODO
+//
+//
+//            } catch (DecodingException ex) {
+//            throw new TelloNetworkException("Error while parsing state input \"" + state + "\"");
+//        }
+        return new TelloDroneState(pitch, roll, yaw, speedX, speedY, speedZ, tempLow, tempHigh, tofDistance, height, battery, motorTime, barometer, accelerationX, accelerationY, accelerationZ);
+
     }
 }

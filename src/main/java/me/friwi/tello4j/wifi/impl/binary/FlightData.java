@@ -3,7 +3,7 @@ package me.friwi.tello4j.wifi.impl.binary;
 import org.codehaus.preon.annotation.Bound;
 import org.codehaus.preon.annotation.BoundNumber;
 
-public class FlightData extends TelloMessage{
+public class FlightData implements TelloMessage{
 
     //byte 0 - 9
     @BoundNumber

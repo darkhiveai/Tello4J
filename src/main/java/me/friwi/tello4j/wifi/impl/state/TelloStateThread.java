@@ -20,8 +20,14 @@ import me.friwi.tello4j.api.exception.TelloException;
 import me.friwi.tello4j.api.exception.TelloNetworkException;
 import me.friwi.tello4j.api.state.StateListener;
 import me.friwi.tello4j.api.state.TelloDroneState;
+import me.friwi.tello4j.wifi.impl.binary.TelloPacket;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryConnectRequest;
+import me.friwi.tello4j.wifi.impl.network.TelloBinaryCommandConnection;
 import me.friwi.tello4j.wifi.impl.network.TelloTextCommandConnection;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
+import org.codehaus.preon.Codec;
+import org.codehaus.preon.Codecs;
+import org.codehaus.preon.DecodingException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
@@ -33,18 +39,26 @@ public class TelloStateThread extends Thread {
     private boolean running = true;
     private TelloTextCommandConnection connection;
     private DatagramSocket ds;
+    private static final Codec<TelloPacket> codec = Codecs.create(TelloPacket.class);
 
     public TelloStateThread(TelloTextCommandConnection connection) {
         this.connection = connection;
     }
 
+
     public void connect() throws TelloNetworkException {
+
         try {
-            ds = new DatagramSocket(TelloSDKValues.STATE_PORT, InetAddress.getByName(TelloSDKValues.COMMANDER_IP_DST));
-            ds.setSoTimeout(TelloSDKValues.STATE_SOCKET_TIMEOUT);
+
+            DatagramSocket socket = new DatagramSocket(TelloSDKValues.COMMAND_PORT, InetAddress.getByName(TelloSDKValues.COMMANDER_IP_DST));
+            socket.setSoTimeout(TelloSDKValues.STATE_SOCKET_TIMEOUT);
+            connect(socket);
         } catch (Exception e) {
             throw new TelloNetworkException("Error while creating state receive socket", e);
         }
+    }
+    public void connect(DatagramSocket socket) throws TelloNetworkException {
+            ds = socket;
     }
 
     public void run() {
@@ -64,10 +78,25 @@ public class TelloStateThread extends Thread {
 
     private void handleInput(byte[] bytes) throws TelloException {
         try {
-            this.handleInput(new String(bytes, "UTF-8"));
+            if(connection instanceof TelloBinaryCommandConnection)
+            {
+                TelloPacket packet = Codecs.decode(codec, bytes);
+                this.handleInput(packet);
+            } else {
+                this.handleInput(new String(bytes, "UTF-8"));
+            }
+
         } catch (UnsupportedEncodingException e) {
             throw new TelloNetworkException("Your system does not support utf-8", e);
+        } catch (DecodingException e) {
+            throw new TelloNetworkException("Error parsing binary encoding", e);
         }
+    }
+
+    private void handleInput(TelloPacket packet) {
+
+
+
     }
 
     private void handleInput(String s) throws TelloException {
