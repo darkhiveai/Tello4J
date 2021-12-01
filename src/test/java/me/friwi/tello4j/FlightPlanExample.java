@@ -22,6 +22,7 @@ import me.friwi.tello4j.api.exception.*;
 import me.friwi.tello4j.api.video.TelloVideoExportType;
 import me.friwi.tello4j.api.video.VideoWindow;
 import me.friwi.tello4j.api.world.FlipDirection;
+import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
 import me.friwi.tello4j.wifi.model.PacketMode;
 
 public class FlightPlanExample {
@@ -34,10 +35,11 @@ public class FlightPlanExample {
                 //Do sth when switching from one to another state
             });
 //            Create a video window to see things with our drones eyes
-//            drone.addVideoListener(new VideoWindow());
+            drone.addVideoListener(new VideoWindow());
 //            //...or use a custom video listener to process the single frames
 //            drone.addVideoListener(frame -> {
 //                //Do sth when we received a frame
+//                System.out.println(frame);
 //            });
             //...[optional] select which type of frame you want to receive
             // a) [default] BUFFERED_IMAGE: Receive buffered images in each TelloVideoFrame
@@ -45,7 +47,8 @@ public class FlightPlanExample {
             // c) BOTH: Receive both frame types in each TelloVideoFrame
 //            drone.setVideoExportType(TelloVideoExportType.BUFFERED_IMAGE);
             //...and tell the drone to turn on the stream
-//            drone.setStreaming(true);
+            drone.setStreaming(true);
+            drone.setVideoBitRate(TelloVideoBitRate.ONE_M);
             //Now perform a flight plan
             drone.throwAndGo();
 //            drone.forward(30);

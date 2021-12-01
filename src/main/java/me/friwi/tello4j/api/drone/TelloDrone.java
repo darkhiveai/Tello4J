@@ -25,6 +25,7 @@ import me.friwi.tello4j.api.video.VideoListener;
 import me.friwi.tello4j.api.world.FlipDirection;
 import me.friwi.tello4j.api.world.MovementDirection;
 import me.friwi.tello4j.api.world.TurnDirection;
+import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -622,4 +623,12 @@ public abstract class TelloDrone implements AutoCloseable {
     public void setVideoExportType(TelloVideoExportType videoExportType) {
         this.videoExportType = videoExportType;
     }
+
+    /**
+     * Sets the current {@link TelloVideoBitRate} for this drone. Please note that it may take a few seconds for the
+     * new rate to be applied.
+     *
+     * @param videoBitRate The new video bitrate.
+     */
+    public abstract void setVideoBitRate(TelloVideoBitRate videoBitRate) throws TelloCommandTimedOutException, TelloNetworkException, TelloCustomCommandException, TelloGeneralCommandException;
 }

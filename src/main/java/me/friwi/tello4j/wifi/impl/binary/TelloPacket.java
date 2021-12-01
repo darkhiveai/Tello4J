@@ -155,7 +155,7 @@ public class TelloPacket extends TelloBinaryCommand {
     public static short crc8(byte[] buffer){
         short crc = 0x77;
         byte[] bytes = Arrays.copyOf(buffer,3);
-        for(int i=0; i< buffer.length; i++) {
+        for(int i=0; i< bytes.length; i++) {
             crc = crc8table[(crc ^ bytes[i]) & 0xff];
         }
         return crc;

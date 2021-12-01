@@ -21,6 +21,7 @@ import me.friwi.tello4j.api.exception.*;
 import me.friwi.tello4j.api.world.FlipDirection;
 import me.friwi.tello4j.api.world.MovementDirection;
 import me.friwi.tello4j.api.world.TurnDirection;
+import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
 import me.friwi.tello4j.wifi.impl.command.control.*;
 import me.friwi.tello4j.wifi.impl.command.read.*;
 import me.friwi.tello4j.wifi.impl.command.set.RemoteControlCommand;
@@ -230,5 +231,11 @@ public class WifiTextDrone extends TelloDrone {
 
     public int fetchWifiSnr() throws TelloCommandTimedOutException, TelloNetworkException, TelloCustomCommandException, TelloGeneralCommandException {
         return (int) fetch(new ReadWifiSNRCommand())[0];
+    }
+
+    @Override
+    public void setVideoBitRate(TelloVideoBitRate videoBitRate) {
+        throw new UnsupportedOperationException();
+
     }
 }

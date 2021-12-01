@@ -50,7 +50,7 @@ public class TelloStateThread extends Thread {
 
         try {
 
-            DatagramSocket socket = new DatagramSocket(TelloSDKValues.COMMAND_PORT, InetAddress.getByName(TelloSDKValues.COMMANDER_IP_DST));
+            DatagramSocket socket = new DatagramSocket(TelloSDKValues.STATE_PORT, InetAddress.getByName(TelloSDKValues.COMMANDER_IP_DST));
             socket.setSoTimeout(TelloSDKValues.STATE_SOCKET_TIMEOUT);
             connect(socket);
         } catch (Exception e) {
