@@ -30,7 +30,7 @@ import static me.friwi.tello4j.wifi.model.TelloSDKValues.VIDEO_WIDTH;
  * @author Fritz Windisch
  */
 public class VideoPanel extends JPanel implements VideoListener {
-    private TelloVideoFrame frame;
+    private org.bytedeco.javacv.Frame frame;
     private Java2DFrameConverter converter = null;
 
     public VideoPanel() {
@@ -42,11 +42,11 @@ public class VideoPanel extends JPanel implements VideoListener {
         this.setBackground(Color.BLACK);
     }
 
-    public TelloVideoFrame getFrame() {
+    public org.bytedeco.javacv.Frame getFrame() {
         return frame;
     }
 
-    public void setFrame(TelloVideoFrame frame) {
+    public void setFrame(org.bytedeco.javacv.Frame frame) {
         this.frame = frame;
         this.repaint();
     }
@@ -56,17 +56,17 @@ public class VideoPanel extends JPanel implements VideoListener {
         if (gr instanceof Graphics2D) {
             Graphics2D g = (Graphics2D) gr;
             if (getFrame() != null) {
-                if (getFrame().getExportType() == TelloVideoExportType.JAVACV_FRAME) {
+
                     if (converter == null) converter = new Java2DFrameConverter();
-                    this.frame = new TelloVideoFrame(converter.convert(getFrame().getJavaCVFrame()), getFrame().getJavaCVFrame());
-                }
-                g.drawImage(getFrame().getImage(), 0, 0, null);
+
+
+                g.drawImage(converter.convert(frame), 0, 0, null);
             }
         }
     }
 
     @Override
-    public void onFrameReceived(TelloVideoFrame frame) {
+    public void onFrameReceived(org.bytedeco.javacv.Frame frame) {
         setFrame(frame);
     }
 }

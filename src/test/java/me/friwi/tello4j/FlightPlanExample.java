@@ -20,6 +20,7 @@ import me.friwi.tello4j.api.drone.TelloDrone;
 import me.friwi.tello4j.api.drone.WifiDroneFactory;
 import me.friwi.tello4j.api.exception.*;
 import me.friwi.tello4j.api.video.TelloVideoExportType;
+import me.friwi.tello4j.api.video.VideoListener;
 import me.friwi.tello4j.api.video.VideoWindow;
 import me.friwi.tello4j.api.world.FlipDirection;
 import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
@@ -28,7 +29,9 @@ import me.friwi.tello4j.wifi.model.PacketMode;
 public class FlightPlanExample {
     public static void main(String args[]) {
         //Initialize a wifi drone
-        try (TelloDrone drone = new WifiDroneFactory().build(PacketMode.BINARY)) {
+        try (TelloDrone drone = new WifiDroneFactory().build(PacketMode.TEXT)) {
+
+            VideoListener listener = new VideoWindow();
             drone.connect();
             //Subscribe to state updates of our drone (e.g. current speed, attitude)
             drone.addStateListener((o, n) -> {
@@ -48,9 +51,9 @@ public class FlightPlanExample {
 //            drone.setVideoExportType(TelloVideoExportType.BUFFERED_IMAGE);
             //...and tell the drone to turn on the stream
             drone.setStreaming(true);
-            drone.setVideoBitRate(TelloVideoBitRate.ONE_M);
+//            drone.setVideoBitRate(TelloVideoBitRate.ONE_M);
             //Now perform a flight plan
-            drone.throwAndGo();
+//            drone.throwAndGo();
 //            drone.forward(30);
 //            drone.turnLeft(90);
 //            drone.forward(30);

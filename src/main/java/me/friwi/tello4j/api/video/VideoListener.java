@@ -16,6 +16,8 @@
 
 package me.friwi.tello4j.api.video;
 
+import org.bytedeco.javacv.Frame;
+
 import me.friwi.tello4j.api.drone.TelloDrone;
 
 /**
@@ -30,5 +32,5 @@ public interface VideoListener {
      *
      * @param frame
      */
-    void onFrameReceived(TelloVideoFrame frame);
+    void onFrameReceived(Frame frame);
 }

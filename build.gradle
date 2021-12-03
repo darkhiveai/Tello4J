@@ -27,6 +27,7 @@ dependencies {
     implementation 'org.bytedeco:javacv-platform:1.5.2'
     //replace networking with netty.
     implementation 'io.netty:netty-all:4.1.70.Final'
+    implementation("com.google.guava:guava:31.0.1-android")
     implementation 'com.github.chesapeaketechnology:preon:develop-SNAPSHOT'
     testImplementation "junit:junit:4.12"
     testImplementation "com.google.truth:truth:1.1.3"

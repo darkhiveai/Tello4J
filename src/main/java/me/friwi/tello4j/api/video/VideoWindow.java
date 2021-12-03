@@ -48,12 +48,12 @@ public class VideoWindow extends JFrame implements VideoListener {
         this.setVisible(true);
     }
 
-    public void setFrame(TelloVideoFrame frame) {
+    public void setFrame(org.bytedeco.javacv.Frame frame) {
         this.panel.setFrame(frame);
     }
 
     @Override
-    public void onFrameReceived(TelloVideoFrame frame) {
+    public void onFrameReceived(org.bytedeco.javacv.Frame frame) {
         setFrame(frame);
     }
 }

@@ -16,7 +16,10 @@
 
 package me.friwi.tello4j.wifi.impl.video;
 
+import static org.bytedeco.ffmpeg.global.avutil.AV_PIX_FMT_RGBA;
+
 import me.friwi.tello4j.api.video.TelloVideoFrame;
+import me.friwi.tello4j.api.video.VideoListener;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
 import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.ffmpeg.global.avutil;
@@ -27,8 +30,15 @@ import org.bytedeco.javacv.Java2DFrameConverter;
 import static me.friwi.tello4j.wifi.model.TelloSDKValues.VIDEO_HEIGHT;
 import static me.friwi.tello4j.wifi.model.TelloSDKValues.VIDEO_WIDTH;
 
+import com.google.common.util.concurrent.RateLimiter;
+
 public class TelloFrameGrabberThread extends Thread {
     private TelloVideoThread videoThread;
+    private final RateLimiter rateLimiter = RateLimiter.create(9); // rate = 5000 permits per second
+    TelloFrameGrabberThread(TelloVideoThread videoThread, VideoListener listener) {
+        setName("Frame-Grabber");
+        this.videoThread = videoThread;
+    }
 
     TelloFrameGrabberThread(TelloVideoThread videoThread) {
         setName("Frame-Grabber");
@@ -42,10 +52,11 @@ public class TelloFrameGrabberThread extends Thread {
         CustomFFmpegFrameGrabber fg = new CustomFFmpegFrameGrabber(videoThread.pis);
         fg.setImageMode(FrameGrabber.ImageMode.COLOR);
         fg.setFormat("h264");
-        fg.setFrameRate(30);
+        fg.setFrameRate(5);
         fg.setVideoCodec(avcodec.AV_CODEC_ID_H264);
         fg.setImageWidth(VIDEO_WIDTH);
         fg.setImageHeight(VIDEO_HEIGHT);
+        fg.setPixelFormat(AV_PIX_FMT_RGBA);
         try {
             fg.start();
         } catch (FrameGrabber.Exception e) {
@@ -57,20 +68,26 @@ public class TelloFrameGrabberThread extends Thread {
             try {
                 f = fg.grabImage();
                 if (f != null) {
-                    TelloVideoFrame frame;
-                    switch (videoThread.getConnection().getDrone().getVideoExportType()) {
-                        case BUFFERED_IMAGE:
-                            frame = new TelloVideoFrame(conv.convert(f));
-                            break;
-                        case JAVACV_FRAME:
-                            frame = new TelloVideoFrame(f.clone());
-                            break;
-                        case BOTH:
-                        default:
-                            Frame cloned = f.clone();
-                            frame = new TelloVideoFrame(conv.convert(cloned), cloned);
+//                    TelloVideoFrame frame;
+//                    switch (videoThread.getConnection().getDrone().getVideoExportType()) {
+//                        case BUFFERED_IMAGE:
+//                            frame = new TelloVideoFrame(conv.convert(f));
+//                            break;
+//                        case JAVACV_FRAME:
+//                            frame = new TelloVideoFrame(f.clone());
+//                            break;
+//                        case BOTH:
+//                        default:
+//                            Frame cloned = f.clone();
+//                            frame = new TelloVideoFrame(conv.convert(cloned), cloned);
+//                    }
+                    if (rateLimiter.tryAcquire(1)) {
+
+                    for (VideoListener listener : this.videoThread.getConnection().getDrone().getVideoListeners()) {
+
+                        listener.onFrameReceived(f);
                     }
-                    videoThread.queue.queueFrame(frame);
+                    }
                 }
             } catch (FrameGrabber.Exception e) {
                 e.printStackTrace();

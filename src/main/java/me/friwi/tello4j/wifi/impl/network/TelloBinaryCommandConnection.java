@@ -19,7 +19,6 @@ package me.friwi.tello4j.wifi.impl.network;
 import me.friwi.tello4j.api.drone.TelloDrone;
 import me.friwi.tello4j.api.exception.*;
 import me.friwi.tello4j.wifi.impl.WifiBinaryDrone;
-import me.friwi.tello4j.wifi.impl.WifiTextDrone;
 import me.friwi.tello4j.wifi.impl.state.TelloStateThread;
 import me.friwi.tello4j.wifi.impl.video.TelloVideoThread;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;

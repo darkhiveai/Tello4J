@@ -16,13 +16,15 @@
 
 package me.friwi.tello4j.wifi.impl.video;
 
+import org.bytedeco.javacv.Frame;
+
 import me.friwi.tello4j.api.video.TelloVideoFrame;
 import me.friwi.tello4j.api.video.VideoListener;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TelloVideoQueue extends Thread {
-    private ConcurrentLinkedQueue<TelloVideoFrame> queue = new ConcurrentLinkedQueue<>();
+    private ConcurrentLinkedQueue<Frame> queue = new ConcurrentLinkedQueue<>();
     private boolean running = true;
     private TelloVideoThread videoThread;
 
@@ -33,7 +35,7 @@ public class TelloVideoQueue extends Thread {
     public synchronized void run() {
         setName("Video-Queue");
         while (running) {
-            TelloVideoFrame frame = queue.poll();
+            Frame frame = queue.poll();
             if (frame != null) {
                 for (VideoListener listener : this.videoThread.getConnection().getDrone().getVideoListeners()) {
                     listener.onFrameReceived(frame);
@@ -48,7 +50,7 @@ public class TelloVideoQueue extends Thread {
         }
     }
 
-    public synchronized void queueFrame(TelloVideoFrame frame) {
+    public synchronized void queueFrame(Frame frame) {
         queue.add(frame);
         this.notifyAll();
     }
