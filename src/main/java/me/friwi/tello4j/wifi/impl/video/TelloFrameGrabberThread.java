@@ -86,6 +86,8 @@ public class TelloFrameGrabberThread extends Thread {
                     for (VideoListener listener : this.videoThread.getConnection().getDrone().getVideoListeners()) {
 
                         listener.onFrameReceived(f);
+                        //TODO profile this to determine if more effective to queue
+                        //videoThread.queue.queueFrame(f);
                     }
                     }
                 }

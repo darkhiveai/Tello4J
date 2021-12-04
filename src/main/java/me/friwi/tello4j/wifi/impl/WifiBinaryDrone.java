@@ -23,7 +23,9 @@ import me.friwi.tello4j.api.world.MovementDirection;
 import me.friwi.tello4j.api.world.TurnDirection;
 import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryConnectRequest;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryLand;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetVideoBitRate;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryTakeoff;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryThrowAndGo;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryVideoStart;
 import me.friwi.tello4j.wifi.impl.command.control.*;
@@ -81,7 +83,7 @@ public class WifiBinaryDrone extends TelloDrone {
 
     public void takeoff() throws TelloCommandTimedOutException, TelloCustomCommandException, TelloNetworkException, TelloGeneralCommandException {
         try {
-            this.commandConnection.sendCommand(new TakeoffCommand());
+            this.commandConnection.sendCommand(new TelloBinaryTakeoff());
         } catch (TelloNoValidIMUException e) {
             //Will (hopefully) never happen
             e.printStackTrace();
@@ -110,7 +112,7 @@ public class WifiBinaryDrone extends TelloDrone {
 
     public void land() throws TelloCommandTimedOutException, TelloCustomCommandException, TelloNetworkException, TelloGeneralCommandException {
         try {
-            this.commandConnection.sendCommand(new LandCommand());
+            this.commandConnection.sendCommand(new TelloBinaryLand());
         } catch (TelloNoValidIMUException e) {
             //Will (hopefully) never happen
             e.printStackTrace();
