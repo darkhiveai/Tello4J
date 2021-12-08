@@ -24,21 +24,18 @@ import me.friwi.tello4j.api.world.TurnDirection;
 import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryConnectRequest;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryLand;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetExposure;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetSticks;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetVideoBitRate;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetVideoDyn;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetVideoMode;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryTakeoff;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryThrowAndGo;
-import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryVideoStart;
 import me.friwi.tello4j.wifi.impl.command.control.*;
-import me.friwi.tello4j.wifi.impl.command.read.*;
-import me.friwi.tello4j.wifi.impl.command.set.RemoteControlCommand;
-import me.friwi.tello4j.wifi.impl.command.set.SetSpeedCommand;
-import me.friwi.tello4j.wifi.impl.command.set.SetWifiPasswordAndSSIDCommand;
 import me.friwi.tello4j.wifi.impl.network.TelloBinaryCommandConnection;
 import me.friwi.tello4j.wifi.impl.network.TelloTextCommandConnection;
-import me.friwi.tello4j.wifi.impl.response.TelloReadCommandResponse;
+import me.friwi.tello4j.wifi.impl.video.TelloFrameGrabberThread;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
-import me.friwi.tello4j.wifi.model.command.ReadCommand;
-import me.friwi.tello4j.wifi.model.response.TelloResponse;
 
 public class WifiBinaryDrone extends TelloDrone {
     private TelloTextCommandConnection commandConnection;
@@ -50,13 +47,18 @@ public class WifiBinaryDrone extends TelloDrone {
     }
 
     @Override
-    public void connect() throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException {
-        this.connect(TelloSDKValues.DRONE_IP_DST);
+    public TelloTextCommandConnection getConnection() {
+        return commandConnection;
     }
 
     @Override
-    public void connect(String remoteAddr) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException {
-        this.commandConnection.connect(remoteAddr);
+    public void connect(TelloFrameGrabberThread frameGrabberThread) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException {
+        this.connect(TelloSDKValues.DRONE_IP_DST, frameGrabberThread);
+    }
+
+    @Override
+    public void connect(String remoteAddr, TelloFrameGrabberThread frameGrabberThread) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException {
+        this.commandConnection.connect(remoteAddr, frameGrabberThread);
         //Enter SDK mode
         try {
 
@@ -103,7 +105,9 @@ public class WifiBinaryDrone extends TelloDrone {
     @Override
     public void setVideoBitRate(TelloVideoBitRate videoBitRate) throws TelloCommandTimedOutException, TelloNetworkException, TelloCustomCommandException, TelloGeneralCommandException {
         try {
+            this.commandConnection.sendCommand(new TelloBinarySetExposure((byte) 0));
             this.commandConnection.sendCommand(new TelloBinarySetVideoBitRate(videoBitRate));
+
         } catch (TelloNoValidIMUException e) {
             //Will (hopefully) never happen
             e.printStackTrace();
@@ -126,8 +130,10 @@ public class WifiBinaryDrone extends TelloDrone {
     public void setStreaming(boolean stream) throws TelloCommandTimedOutException, TelloCustomCommandException, TelloNetworkException, TelloGeneralCommandException {
         //Only notify drone on state change
         try {
-            if (stream && !streaming) {
-                this.commandConnection.sendCommand(new TelloBinaryVideoStart());
+            if (stream ) {
+                this.commandConnection.sendCommand(new TelloBinarySetVideoDyn(1));
+                this.commandConnection.sendCommand(new TelloBinarySetVideoMode(0));
+
             } else if (!stream && streaming) {
                 this.commandConnection.sendCommand(new StreamOffCommand());
             }
@@ -146,7 +152,12 @@ public class WifiBinaryDrone extends TelloDrone {
 
     @Override
     public void moveDirection(MovementDirection direction, int cm) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloNoValidIMUException, TelloGeneralCommandException {
-
+        try {
+            this.commandConnection.sendCommand(new TelloBinarySetSticks());
+        } catch (TelloNoValidIMUException e) {
+            //Will (hopefully) never happen
+            e.printStackTrace();
+        }
     }
 
     @Override

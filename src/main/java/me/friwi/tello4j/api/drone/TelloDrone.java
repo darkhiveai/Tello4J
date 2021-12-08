@@ -26,6 +26,8 @@ import me.friwi.tello4j.api.world.FlipDirection;
 import me.friwi.tello4j.api.world.MovementDirection;
 import me.friwi.tello4j.api.world.TurnDirection;
 import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
+import me.friwi.tello4j.wifi.impl.network.TelloTextCommandConnection;
+import me.friwi.tello4j.wifi.impl.video.TelloFrameGrabberThread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +52,9 @@ public abstract class TelloDrone implements AutoCloseable {
         this.disconnect();
     }
 
+
+    public abstract TelloTextCommandConnection getConnection();
+
     /**
      * Estabilishes a connection with a tello drone at the default address (192.168.10.1). Can only be used once, please construct a new tello drone object
      * when reconnecting.
@@ -57,30 +62,32 @@ public abstract class TelloDrone implements AutoCloseable {
      *
      * @throws TelloNetworkException         If communication with the tello drone produced invalid input or
      *                                       the wifi network was set up incorrectly. Also thrown if you called
-     *                                       {@link #connect()} twice.
+     *                                       {@link #connect(TelloFrameGrabberThread)} twice.
      * @throws TelloCommandTimedOutException If the tello drone did not answer in time.
      * @throws TelloCustomCommandException   If the tello drone answered with a custom error message.
      *                                       Use {@link TelloCustomCommandException#getReason()} to fetch the custom error message.
      * @throws TelloGeneralCommandException  If the tello drone answered with an unspecified error (possibly battery too low).
+     * @param frameGrabberThread
      */
-    public abstract void connect() throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException;
+    public abstract void connect(TelloFrameGrabberThread frameGrabberThread) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException;
 
     /**
      * Estabilishes a connection with a tello drone at a custom address. Can only be used once, please construct a new tello drone object
      * when reconnecting.
      * You still need to connect to the tello wifi manually before invoking this call.
      *
-     * @param remoteAddr The remote address or hostname your tello uses. If unsure, use {@link #connect()} to connect to the default destination IP.
+     * @param remoteAddr The remote address or hostname your tello uses. If unsure, use {@link #connect(TelloFrameGrabberThread)} to connect to the default destination IP.
      *
+     * @param frameGrabberThread
      * @throws TelloNetworkException         If communication with the tello drone produced invalid input or
      *                                       the wifi network was set up incorrectly. Also thrown if you called
-     *                                       {@link #connect()} twice.
+     *                                       {@link #connect(TelloFrameGrabberThread)} twice.
      * @throws TelloCommandTimedOutException If the tello drone did not answer in time.
      * @throws TelloCustomCommandException   If the tello drone answered with a custom error message.
      *                                       Use {@link TelloCustomCommandException#getReason()} to fetch the custom error message.
      * @throws TelloGeneralCommandException  If the tello drone answered with an unspecified error (possibly battery too low).
      */
-    public abstract void connect(String remoteAddr) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException;
+    public abstract void connect(String remoteAddr, TelloFrameGrabberThread frameGrabberThread) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException;
 
     /**
      * Disconnects from this tello drone. Does not close this drones resources.

@@ -1,7 +1,3 @@
-/*
- * Copyright 2021 Darkhive, Inc. All Rights Reserved.
- */
-
 package me.friwi.tello4j.wifi.impl.binary.command;
 
 import java.io.UnsupportedEncodingException;
@@ -12,14 +8,22 @@ import me.friwi.tello4j.api.exception.TelloNetworkException;
 import me.friwi.tello4j.api.exception.TelloNoValidIMUException;
 import me.friwi.tello4j.wifi.model.response.TelloResponse;
 
-public class TelloBinaryVideoStart extends TelloBinaryCommand{
+public class TelloBinarySetVideoMode extends TelloBinaryCommand{
 
-    private static final byte[] bytes = new byte[] {(byte) 0xcc, 0x58, 0x00, 0x7c, 0x60, 0x25, 0x00, 0x09, 0x00, 0x00, 0x5b, (byte) 0xc5};
-//    private static final byte[] bytes = new byte[] {(byte) 0xcc, 0x58, 0x00, 0x7c, 0x48, 0x5d, 0x00, (byte) 0xe4, 0x01, (byte) 0x40, 0x10 };
 
+
+    private final int mode;
+    //                                                                       crc    typ  cmdL  cmdH  seqL  seqH  rateL  crc
+    private static final byte[] bytes = new byte[] {(byte) 0xcc, 0x60, 0x00, 0x27, 0x68, 0x31, 0x00, 0x00, 0x00, 0x00, 0x5b, (byte) 0xc5};
+
+
+
+    public TelloBinarySetVideoMode(int mode) {
+        this.mode = mode;
+    }
     @Override
     public byte[] serializeCommand() {
-
+        bytes[9] = (byte) mode;
         return fixupPacket(bytes);
     }
 

@@ -19,26 +19,22 @@ package me.friwi.tello4j;
 import me.friwi.tello4j.api.drone.TelloDrone;
 import me.friwi.tello4j.api.drone.WifiDroneFactory;
 import me.friwi.tello4j.api.exception.*;
-import me.friwi.tello4j.api.video.TelloVideoExportType;
-import me.friwi.tello4j.api.video.VideoListener;
-import me.friwi.tello4j.api.video.VideoWindow;
-import me.friwi.tello4j.api.world.FlipDirection;
-import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
+import me.friwi.tello4j.api.world.MovementDirection;
+import me.friwi.tello4j.wifi.impl.video.TelloFrameFFMpegGrabberThread;
 import me.friwi.tello4j.wifi.model.PacketMode;
 
 public class FlightPlanExample {
-    public static void main(String args[]) {
+    public static void main(String args[]) throws InterruptedException {
         //Initialize a wifi drone
-        try (TelloDrone drone = new WifiDroneFactory().build(PacketMode.TEXT)) {
+        try (TelloDrone drone = new WifiDroneFactory().build(PacketMode.BINARY)) {
 
-            VideoListener listener = new VideoWindow();
-            drone.connect();
+            drone.connect(new TelloFrameFFMpegGrabberThread());
             //Subscribe to state updates of our drone (e.g. current speed, attitude)
             drone.addStateListener((o, n) -> {
                 //Do sth when switching from one to another state
             });
 //            Create a video window to see things with our drones eyes
-            drone.addVideoListener(new VideoWindow());
+//            drone.addVideoListener(new VideoWindow());
 //            //...or use a custom video listener to process the single frames
 //            drone.addVideoListener(frame -> {
 //                //Do sth when we received a frame
@@ -50,8 +46,12 @@ public class FlightPlanExample {
             // c) BOTH: Receive both frame types in each TelloVideoFrame
 //            drone.setVideoExportType(TelloVideoExportType.BUFFERED_IMAGE);
             //...and tell the drone to turn on the stream
-            drone.setStreaming(true);
+//            drone.setStreaming(true);
 //            drone.setVideoBitRate(TelloVideoBitRate.ONE_M);
+//            drone.setStreaming(true);
+//            drone.setVideoBitRate(TelloVideoBitRate.ONE_M);
+//            drone.setStreaming(true);
+
             //Now perform a flight plan
 //            drone.throwAndGo();
 //            drone.forward(30);
@@ -64,7 +64,15 @@ public class FlightPlanExample {
 //            drone.land();
             //Prevent our drone from being closed
             //(the drone is automatically closed when leaving the try-with-resource block)
-            while (true) ;
+            while (true) {
+                drone.moveDirection(MovementDirection.UP, 1);
+
+
+
+//                drone.setStreaming(true);
+                Thread.sleep(2000);
+
+            }
         } catch (TelloNetworkException e) {
             if(e instanceof TelloConnectionTimedOutException){
                 //The connection timed out because we did not send commands within the last 15 seconds.
@@ -92,6 +100,9 @@ public class FlightPlanExample {
             e.printStackTrace();
         } catch (TelloCommandTimedOutException e) {
             //This exception is thrown when a command is not answered by the drone for 20 seconds
+            e.printStackTrace();
+//        }
+        } catch (TelloNoValidIMUException e) {
             e.printStackTrace();
         }
     }

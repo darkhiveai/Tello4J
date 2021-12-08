@@ -16,6 +16,7 @@ public abstract class TelloBinaryCommand extends TelloCommand {
     private static short seqNum = 0;
     protected byte[] fixupPacket(byte[] bytes)
     {
+        seqNum++;
         bytes[3] = (byte) TelloPacket.crc8(Arrays.copyOf(bytes, 4));
         bytes[7] = (byte)(seqNum & 0xff);
         bytes[8] = (byte)((seqNum >> 8) & 0xff);

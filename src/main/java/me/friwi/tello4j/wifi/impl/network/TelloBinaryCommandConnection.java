@@ -20,6 +20,7 @@ import me.friwi.tello4j.api.drone.TelloDrone;
 import me.friwi.tello4j.api.exception.*;
 import me.friwi.tello4j.wifi.impl.WifiBinaryDrone;
 import me.friwi.tello4j.wifi.impl.state.TelloStateThread;
+import me.friwi.tello4j.wifi.impl.video.TelloFrameGrabberThread;
 import me.friwi.tello4j.wifi.impl.video.TelloVideoThread;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
 import me.friwi.tello4j.wifi.model.command.TelloCommand;
@@ -40,14 +41,15 @@ public class TelloBinaryCommandConnection extends TelloTextCommandConnection {
         this.drone = drone;
     }
 
-    public void connect(String remote) throws TelloNetworkException {
-        if(onceConnected)throw new TelloNetworkException("You can not reconnect by using connect(). Please build a new tello drone object.");
-        try {
+    public void connect(String remote, TelloFrameGrabberThread frameGrabberThread) throws TelloNetworkException {
+        if(!onceConnected)
+            try {
             onceConnected = true;
             lastCommand = System.currentTimeMillis();
             queue = new TelloCommandQueue(this);
             stateThread = new TelloStateThread(this);
-            videoThread = new TelloVideoThread(this);
+            videoThread = new TelloVideoThread(this, frameGrabberThread);
+            frameGrabberThread.setTelloVideoThread(videoThread);
             this.remoteAddress = InetAddress.getByName(remote);
             ds = new DatagramSocket(TelloSDKValues.COMMAND_PORT);
             ds.setSoTimeout(TelloSDKValues.COMMAND_SOCKET_TIMEOUT);
@@ -74,9 +76,9 @@ public class TelloBinaryCommandConnection extends TelloTextCommandConnection {
     }
 
     public TelloResponse sendCommand(TelloCommand cmd) throws TelloNetworkException, TelloCommandTimedOutException, TelloGeneralCommandException, TelloNoValidIMUException, TelloCustomCommandException {
-        if(lastCommand+TelloSDKValues.COMMAND_TIMEOUT<System.currentTimeMillis()){
-            throw new TelloConnectionTimedOutException();
-        }
+//        if(lastCommand+TelloSDKValues.TEXT_COMMAND_TIMEOUT <System.currentTimeMillis()){
+//            throw new TelloConnectionTimedOutException();
+//        }
         lastCommand = System.currentTimeMillis();
         synchronized (cmd) {
             queue.queueCommand(cmd);
@@ -169,7 +171,7 @@ public class TelloBinaryCommandConnection extends TelloTextCommandConnection {
     }
 
     public boolean isConnected() {
-        return connectionState && (lastCommand+TelloSDKValues.COMMAND_TIMEOUT) > System.currentTimeMillis();
+        return connectionState && (lastCommand+TelloSDKValues.TEXT_COMMAND_TIMEOUT) > System.currentTimeMillis();
     }
 
     public TelloDrone getDrone() {

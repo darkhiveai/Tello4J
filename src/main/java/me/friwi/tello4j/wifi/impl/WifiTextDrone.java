@@ -29,6 +29,7 @@ import me.friwi.tello4j.wifi.impl.command.set.SetSpeedCommand;
 import me.friwi.tello4j.wifi.impl.command.set.SetWifiPasswordAndSSIDCommand;
 import me.friwi.tello4j.wifi.impl.network.TelloTextCommandConnection;
 import me.friwi.tello4j.wifi.impl.response.TelloReadCommandResponse;
+import me.friwi.tello4j.wifi.impl.video.TelloFrameGrabberThread;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
 import me.friwi.tello4j.wifi.model.command.ReadCommand;
 import me.friwi.tello4j.wifi.model.response.TelloResponse;
@@ -43,13 +44,18 @@ public class WifiTextDrone extends TelloDrone {
     }
 
     @Override
-    public void connect() throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException {
-        this.connect(TelloSDKValues.DRONE_IP_DST);
+    public TelloTextCommandConnection getConnection() {
+        return commandConnection;
     }
 
     @Override
-    public void connect(String remoteAddr) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException {
-        this.commandConnection.connect(remoteAddr);
+    public void connect(TelloFrameGrabberThread frameGrabberThread) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException {
+        this.connect(TelloSDKValues.DRONE_IP_DST, frameGrabberThread);
+    }
+
+    @Override
+    public void connect(String remoteAddr, TelloFrameGrabberThread frameGrabberThread) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloGeneralCommandException {
+        this.commandConnection.connect(remoteAddr, frameGrabberThread);
         //Enter SDK mode
         try {
             this.commandConnection.sendCommand(new EnterSDKModeCommand());
