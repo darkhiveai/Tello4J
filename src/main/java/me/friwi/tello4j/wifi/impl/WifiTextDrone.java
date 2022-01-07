@@ -21,6 +21,7 @@ import me.friwi.tello4j.api.exception.*;
 import me.friwi.tello4j.api.world.FlipDirection;
 import me.friwi.tello4j.api.world.MovementDirection;
 import me.friwi.tello4j.api.world.TurnDirection;
+import me.friwi.tello4j.wifi.impl.binary.TelloSmartVideoCommands;
 import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
 import me.friwi.tello4j.wifi.impl.command.control.*;
 import me.friwi.tello4j.wifi.impl.command.read.*;
@@ -33,6 +34,7 @@ import me.friwi.tello4j.wifi.impl.video.TelloFrameGrabberThread;
 import me.friwi.tello4j.wifi.model.TelloSDKValues;
 import me.friwi.tello4j.wifi.model.command.ReadCommand;
 import me.friwi.tello4j.wifi.model.response.TelloResponse;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class WifiTextDrone extends TelloDrone {
     private TelloTextCommandConnection commandConnection;
@@ -143,6 +145,11 @@ public class WifiTextDrone extends TelloDrone {
         this.commandConnection.sendCommand(new FlyParameterizedCommand(x, y, z, speed));
     }
 
+    @Override
+    public void move(float fRx, float fRy, float fLx, float fLy, float speed) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloNoValidIMUException, TelloGeneralCommandException {
+        throw new NotImplementedException();
+    }
+
     public void curve(int x1, int y1, int z1, int x2, int y2, int z2, int speed) throws TelloCommandTimedOutException, TelloCustomCommandException, TelloNetworkException, TelloNoValidIMUException, TelloGeneralCommandException {
         this.commandConnection.sendCommand(new FlyCurveCommand(x1, x2, y1, y2, z1, z2, speed));
     }
@@ -243,5 +250,10 @@ public class WifiTextDrone extends TelloDrone {
     public void setVideoBitRate(TelloVideoBitRate videoBitRate) {
         throw new UnsupportedOperationException();
 
+    }
+
+    @Override
+    public void smartVideo(TelloSmartVideoCommands svCmd) throws TelloCommandTimedOutException, TelloNetworkException, TelloCustomCommandException, TelloGeneralCommandException {
+        throw new NotImplementedException();
     }
 }

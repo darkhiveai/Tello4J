@@ -7,23 +7,27 @@ import me.friwi.tello4j.api.exception.TelloCustomCommandException;
 import me.friwi.tello4j.api.exception.TelloGeneralCommandException;
 import me.friwi.tello4j.api.exception.TelloNetworkException;
 import me.friwi.tello4j.api.exception.TelloNoValidIMUException;
-import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
 import me.friwi.tello4j.wifi.model.response.TelloResponse;
 
 public class TelloBinarySetSticks extends TelloBinaryCommand{
 
 
-
+    private final float fRx, fRy, fLy, fLx, speed;
     //                                                                       crc    typ  cmdL  cmdH  seqL  seqH  rateL  crc
     private static final byte[] bytes = new byte[] {(byte) 0xcc, (byte) 0xb0, 0x00, 0x7f, 0x60, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x16, 0x01, 0x0e, 0x00, 0x25, 0x54 };
 
-    public TelloBinarySetSticks() {
-        
+    public TelloBinarySetSticks(float fRx, float fRy, float fLy, float fLx, float speed) {
+        this.fRx = fRx;
+        this.fRy = fRy;
+
+        this.fLy = fLy;
+        this.fLx = fLx;
+        this.speed = speed;
     }
     @Override
     public byte[] serializeCommand() {
         
-        short fRx = 0, fRy = 0, fLy = 0, fLx = 0, speed = 0;
+
 
         short axis1 = (short)(660.0F * fRx + 1024.0F);//RightX center=1024 left =364 right =-364
         short axis2 = (short)(660.0F * fRy + 1024.0F);//RightY down =364 up =-364

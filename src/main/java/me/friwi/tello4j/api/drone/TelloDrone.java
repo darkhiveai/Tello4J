@@ -25,6 +25,7 @@ import me.friwi.tello4j.api.video.VideoListener;
 import me.friwi.tello4j.api.world.FlipDirection;
 import me.friwi.tello4j.api.world.MovementDirection;
 import me.friwi.tello4j.api.world.TurnDirection;
+import me.friwi.tello4j.wifi.impl.binary.TelloSmartVideoCommands;
 import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
 import me.friwi.tello4j.wifi.impl.network.TelloTextCommandConnection;
 import me.friwi.tello4j.wifi.impl.video.TelloFrameGrabberThread;
@@ -228,6 +229,21 @@ public abstract class TelloDrone implements AutoCloseable {
      *                                       not provide enough textual features.
      */
     public abstract void move(int x, int y, int z, int speed) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloNoValidIMUException, TelloGeneralCommandException;
+
+    /**
+     * Instructs this drone to move to a relative position (x, y, z) with a set speed
+     *
+     *
+     * @param speed Flying speed
+     * @throws TelloNetworkException         If there was an error sending the command or receiving the result.
+     * @throws TelloCommandTimedOutException If the drone does not answer.
+     * @throws TelloCustomCommandException   If the drone responds with a custom error message.
+     *                                       Use {@link TelloCustomCommandException#getReason()} to fetch the custom error message.
+     * @throws TelloGeneralCommandException  If the drone responds with an unspecified error.
+     * @throws TelloNoValidIMUException      If the IMU is not correctly calibrated or the ground beneath the drone does
+     *                                       not provide enough textual features.
+     */
+    public abstract void move(float fRx, float fRy, float fLx, float fLy, float speed) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloNoValidIMUException, TelloGeneralCommandException;
 
     /**
      * Instructs this drone to fly a curve via one relative point to another
@@ -638,4 +654,6 @@ public abstract class TelloDrone implements AutoCloseable {
      * @param videoBitRate The new video bitrate.
      */
     public abstract void setVideoBitRate(TelloVideoBitRate videoBitRate) throws TelloCommandTimedOutException, TelloNetworkException, TelloCustomCommandException, TelloGeneralCommandException;
+
+    public abstract void smartVideo(TelloSmartVideoCommands svCmd) throws TelloCommandTimedOutException, TelloNetworkException, TelloCustomCommandException, TelloGeneralCommandException;
 }

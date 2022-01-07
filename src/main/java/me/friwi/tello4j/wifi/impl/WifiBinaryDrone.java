@@ -21,6 +21,7 @@ import me.friwi.tello4j.api.exception.*;
 import me.friwi.tello4j.api.world.FlipDirection;
 import me.friwi.tello4j.api.world.MovementDirection;
 import me.friwi.tello4j.api.world.TurnDirection;
+import me.friwi.tello4j.wifi.impl.binary.TelloSmartVideoCommands;
 import me.friwi.tello4j.wifi.impl.binary.TelloVideoBitRate;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryConnectRequest;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryLand;
@@ -29,6 +30,7 @@ import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetSticks;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetVideoBitRate;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetVideoDyn;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySetVideoMode;
+import me.friwi.tello4j.wifi.impl.binary.command.TelloBinarySmartVideo;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryTakeoff;
 import me.friwi.tello4j.wifi.impl.binary.command.TelloBinaryThrowAndGo;
 import me.friwi.tello4j.wifi.impl.command.control.*;
@@ -114,6 +116,16 @@ public class WifiBinaryDrone extends TelloDrone {
         }
     }
 
+    @Override
+    public void smartVideo(TelloSmartVideoCommands svCmd) throws TelloCommandTimedOutException, TelloNetworkException, TelloCustomCommandException, TelloGeneralCommandException {
+        try {
+            this.commandConnection.sendCommand(new TelloBinarySmartVideo(svCmd));
+        } catch (TelloNoValidIMUException e) {
+            //Will (hopefully) never happen
+            e.printStackTrace();
+        }
+    }
+
     public void land() throws TelloCommandTimedOutException, TelloCustomCommandException, TelloNetworkException, TelloGeneralCommandException {
         try {
             this.commandConnection.sendCommand(new TelloBinaryLand());
@@ -152,12 +164,7 @@ public class WifiBinaryDrone extends TelloDrone {
 
     @Override
     public void moveDirection(MovementDirection direction, int cm) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloNoValidIMUException, TelloGeneralCommandException {
-        try {
-            this.commandConnection.sendCommand(new TelloBinarySetSticks());
-        } catch (TelloNoValidIMUException e) {
-            //Will (hopefully) never happen
-            e.printStackTrace();
-        }
+
     }
 
     @Override
@@ -173,6 +180,16 @@ public class WifiBinaryDrone extends TelloDrone {
     @Override
     public void move(int x, int y, int z, int speed) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloNoValidIMUException, TelloGeneralCommandException {
 
+    }
+
+    @Override
+    public void move(float fRx, float fRy, float fLx, float fLy, float speed) throws TelloNetworkException, TelloCommandTimedOutException, TelloCustomCommandException, TelloNoValidIMUException, TelloGeneralCommandException {
+        try {
+            this.commandConnection.sendCommand(new TelloBinarySetSticks(fRx, fRy, fLy, fLx, speed));
+        } catch (TelloNoValidIMUException e) {
+            //Will (hopefully) never happen
+            e.printStackTrace();
+        }
     }
 
     @Override
